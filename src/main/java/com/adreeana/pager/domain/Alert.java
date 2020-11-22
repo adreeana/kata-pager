@@ -1,8 +1,5 @@
 package com.adreeana.pager.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Alert {
   private String id;
   private MonitoredService monitoredService;
@@ -24,6 +21,10 @@ public class Alert {
     return message;
   }
 
+  public void acknowledge() {
+    acknowledged = true;
+  }
+
   public Boolean isAcknowledged() {
     return acknowledged;
   }
@@ -34,5 +35,17 @@ public class Alert {
 
   public void setLevel(Level level) {
     this.level = level;
+  }
+
+  public void acknowledgeLevel() {
+    if (level == null) return;
+
+    level.acknowledge();
+  }
+
+  public Boolean isLevelAcknowledged() {
+    if (level == null) return false;
+
+    return level.isAcknowledged();
   }
 }
