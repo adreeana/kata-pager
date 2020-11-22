@@ -1,20 +1,20 @@
 package com.adreeana.pager.domain;
 
+import java.util.Optional;
+
 public class PagerService {
+  private final Alerts alerts;
+  private final AlertService alertService;
   private final EscalationPolicyService escalationPolicyService;
-  private final SmsService smsService;
-  private final EmailService emailService;
   private final TimerService timerService;
 
-  public PagerService(
-    EscalationPolicyService escalationPolicyService,
-    SmsService smsService,
-    EmailService emailService,
-    TimerService timerService
-  ) {
+  public PagerService(Alerts alerts,
+                      AlertService alertService,
+                      EscalationPolicyService escalationPolicyService,
+                      TimerService timerService) {
+    this.alerts = alerts;
+    this.alertService = alertService;
     this.escalationPolicyService = escalationPolicyService;
-    this.smsService = smsService;
-    this.emailService = emailService;
     this.timerService = timerService;
   }
 
@@ -23,21 +23,28 @@ public class PagerService {
 
     EscalationPolicy escalationPolicy = escalationPolicyService.findEscalationPolicy(alert.getMonitoredService());
 
-    Levels levels = escalationPolicy.getLevels();
+    alert.setLevel(escalationPolicy.getLevels().first());
+    alerts.save(alert);
 
-    Level firstLevel = levels.first();
-    notifyLevel(alert, firstLevel);
+    alertService.notifyLevel(alert);
 
-    timerService.startAcknowledgementTimer(alert.getMonitoredService(), firstLevel);
+    timerService.startTimer(alert);
   }
 
-  private void notifyLevel(Alert alert, Level firstLevel) {
-    firstLevel.getTargets().forEach(t -> {
-      if (t instanceof SmsTarget) {
-        smsService.notify(t.contact(), alert.getMessage());
-      } else if (t instanceof EmailTarget) {
-        emailService.notify(t.contact(), alert.getMessage());
-      }
-    });
+  public void receiveAcknowledgementTimeout(Alert alert) {
+    if (alert.getMonitoredService().isHealthy()) return;
+
+    EscalationPolicy escalationPolicy = escalationPolicyService.findEscalationPolicy(alert.getMonitoredService());
+
+    Level lastNotifiedLevel = alert.getLevel();
+    Optional<Level> nextLevel = escalationPolicy.getLevels().next(lastNotifiedLevel);
+    if (nextLevel.isPresent()) {
+      alert.setLevel(nextLevel.get());
+      alerts.save(alert);
+
+      alertService.notifyLevel(alert);
+
+      timerService.startTimer(alert);
+    }
   }
 }

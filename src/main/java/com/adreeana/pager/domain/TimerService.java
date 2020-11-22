@@ -1,5 +1,7 @@
 package com.adreeana.pager.domain;
 
+import java.util.List;
+
 public interface TimerService {
-  void startAcknowledgementTimer(MonitoredService service, Level level);
+  void startTimer(Alert alert);
 }

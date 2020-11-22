@@ -2,12 +2,13 @@ package com.adreeana.pager.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Levels {
   private List<Level> levels;
 
   public Levels() {
-    this.levels = new ArrayList();;
+    this.levels = new ArrayList();
   }
 
   public void addLevel(Level level) {
@@ -16,5 +17,13 @@ public class Levels {
 
   public Level first() {
     return levels.get(0);
+  }
+
+  public Optional<Level> next(Level from) {
+    int fromIndex = levels.indexOf(from);
+    if (fromIndex != -1 && levels.size() > fromIndex + 1)
+      return Optional.of(levels.get(fromIndex + 1));
+
+    return Optional.empty();
   }
 }

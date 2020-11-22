@@ -5,8 +5,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class LevelsTest {
@@ -24,32 +27,54 @@ class LevelsTest {
       @Test
       void first() {
         Level firstLevel = new Level();
-        Target smsFirstTarget = new SmsTarget("0601");
-        firstLevel.addTarget(smsFirstTarget);
-        Target emailFirstTarget = new EmailTarget("email01");
-        firstLevel.addTarget(emailFirstTarget);
-        levels.addLevel(firstLevel);
-
         Level secondLevel = new Level();
-        Target smsSecondTarget = new SmsTarget("0602");
-        secondLevel.addTarget(smsSecondTarget);
-        Target emailSecondTarget = new EmailTarget("email02");
-        secondLevel.addTarget(emailSecondTarget);
+
+        levels.addLevel(firstLevel);
         levels.addLevel(secondLevel);
 
-        Level first = levels.first();
-
-        assertEquals(firstLevel, first);
+        assertEquals(firstLevel, levels.first());
       }
     }
+  }
 
+  @Nested
+  class Next {
     @Nested
-    class UnhappyPath {
+    class HappyPath {
       @Test
-      void noSuchElement() {
-        assertThrows(IndexOutOfBoundsException.class, () ->
-          levels.first()
-        );
+      void next() {
+        Level firstLevel = new Level();
+        Level secondLevel = new Level();
+        Level thirdLevel = new Level();
+
+        levels.addLevel(firstLevel);
+        levels.addLevel(secondLevel);
+        levels.addLevel(thirdLevel);
+
+        Optional<Level> next = levels.next(secondLevel);
+        assertTrue(next.isPresent());
+        assertEquals(thirdLevel, next.get());
+      }
+
+      @Test
+      void noNext() {
+        Level firstLevel = new Level();
+
+        levels.addLevel(firstLevel);
+
+        Optional<Level> next = levels.next(firstLevel);
+        assertTrue(next.isEmpty());
+      }
+
+      @Test
+      void notFound() {
+        Level firstLevel = new Level();
+        Level secondLevel = new Level();
+
+        levels.addLevel(secondLevel);
+
+        Optional<Level> next = levels.next(firstLevel);
+        assertTrue(next.isEmpty());
       }
     }
   }
