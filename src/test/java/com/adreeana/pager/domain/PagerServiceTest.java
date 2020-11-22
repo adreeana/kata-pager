@@ -8,8 +8,8 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.Optional;
 
-import static com.adreeana.pager.domain.EscalationPolicyFixture.monitoredService;
-import static com.adreeana.pager.domain.EscalationPolicyFixture.twoLevels;
+import static com.adreeana.pager.domain.LevelsFixture.twoLevels;
+import static com.adreeana.pager.domain.MonitoredServiceFixture.monitoredService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -46,7 +46,7 @@ class PagerServiceTest {
       @BeforeEach
       void setUp() {
         alert = new Alert(monitoredService, "Oups!");
-        escalationPolicy = twoLevels(alert.getMonitoredService());
+        escalationPolicy = new EscalationPolicy(alert.getMonitoredService(), twoLevels());
       }
 
       @Nested
@@ -114,7 +114,7 @@ class PagerServiceTest {
         alert = new Alert(monitoredService, "Oups!");
         alert.getMonitoredService().unhealthy();
 
-        escalationPolicy = twoLevels(alert.getMonitoredService());
+        escalationPolicy = new EscalationPolicy(alert.getMonitoredService(), twoLevels());
         alert.setLevel(escalationPolicy.getLevels().first());
       }
 
@@ -124,14 +124,15 @@ class PagerServiceTest {
         class LevelIsNotAcknowledged {
           @Test
           void receiveAcknowledgementTimeout() {
-            when(escalationPolicyService.findEscalationPolicy(alert.getMonitoredService())).thenReturn(
-              escalationPolicy);
+            when(escalationPolicyService.findEscalationPolicy(alert.getMonitoredService()))
+              .thenReturn(escalationPolicy);
 
             assertFalse(alert.getMonitoredService().isHealthy());
             assertFalse(alert.isAcknowledged());
 
             Level lastNotifiedLevel = alert.getLevel();
             assertNotNull(lastNotifiedLevel);
+            assertFalse(lastNotifiedLevel.isAcknowledged());
 
             pagerService.receiveAcknowledgementTimeout(alert);
 
@@ -215,7 +216,7 @@ class PagerServiceTest {
         alert = new Alert(monitoredService, "Oups!");
         alert.getMonitoredService().unhealthy();
 
-        escalationPolicy = twoLevels(alert.getMonitoredService());
+        escalationPolicy = new EscalationPolicy(alert.getMonitoredService(), twoLevels());
         alert.setLevel(escalationPolicy.getLevels().first());
       }
 
