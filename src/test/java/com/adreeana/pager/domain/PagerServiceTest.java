@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -44,37 +45,59 @@ class PagerServiceTest {
 
       @BeforeEach
       void setUp() {
-        //Given a Monitored Service in a Healthy State,
         alert = new Alert(monitoredService, "Oups!");
         escalationPolicy = twoLevels(alert.getMonitoredService());
       }
 
-      @Test
-      void receiveAlert() {
-        when(escalationPolicyService.findEscalationPolicy(alert.getMonitoredService())).thenReturn(escalationPolicy);
+      @Nested
+      class OnlyOneAlertForTheMonitoredService {
+        @Test
+        void receiveAlert() {
+          when(escalationPolicyService.findEscalationPolicy(alert.getMonitoredService())).thenReturn(escalationPolicy);
 
-        //when the Pager receives an Alert related to this Monitored Service,
-        pagerService.receiveAlert(alert);
+          pagerService.receiveAlert(alert);
 
-        //then the Monitored Service becomes Unhealthy,
-        //the Pager notifies all targets of the first level of the escalation policy,
-        //  and sets a 15-minutes acknowledgement delay
-        assertFalse(alert.getMonitoredService().isHealthy());
+          assertFalse(alert.getMonitoredService().isHealthy());
 
-        ArgumentCaptor<Alert> alertCaptor = ArgumentCaptor.forClass(Alert.class);
-        verify(alerts).save(alertCaptor.capture());
+          ArgumentCaptor<Alert> alertCaptor = ArgumentCaptor.forClass(Alert.class);
+          verify(alerts).save(alertCaptor.capture());
 
-        Alert savedAlert = alertCaptor.getValue();
-        assertEquals(alert, savedAlert);
+          Alert savedAlert = alertCaptor.getValue();
+          assertEquals(alert, savedAlert);
 
-        assertEquals(alert.getLevel(), escalationPolicy.getLevels().first());
+          assertEquals(alert.getLevel(), escalationPolicy.getLevels().first());
 
-        verify(alertService).notifyLevel(alert);
+          verify(alertService).notifyLevel(alert);
 
-        ArgumentCaptor<Alert> startTimerCaptor = ArgumentCaptor.forClass(Alert.class);
-        verify(timerService).startTimer(startTimerCaptor.capture());
+          ArgumentCaptor<Alert> startTimerCaptor = ArgumentCaptor.forClass(Alert.class);
+          verify(timerService).startTimer(startTimerCaptor.capture());
 
-        assertEquals(alert, startTimerCaptor.getValue());
+          assertEquals(alert, startTimerCaptor.getValue());
+        }
+      }
+
+      @Nested
+      class DifferentAlertForTheMonitoredService {
+        Alert anotherAlert;
+
+        @BeforeEach
+        void setUp() {
+          anotherAlert = new Alert(monitoredService, "Oups, I did it again!");
+        }
+
+        @Test
+        void receiveAlert() {
+          when(alerts.alertReceived(alert.getMonitoredService())).thenReturn(true);
+
+          pagerService.receiveAlert(anotherAlert);
+
+          verify(alerts).alertReceived(alert.getMonitoredService());
+          verifyNoMoreInteractions(alerts);
+
+          verifyNoInteractions(escalationPolicyService);
+          verifyNoInteractions(alertService);
+          verifyNoInteractions(timerService);
+        }
       }
     }
   }

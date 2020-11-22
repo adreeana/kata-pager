@@ -19,10 +19,11 @@ public class PagerService {
   }
 
   public void receiveAlert(Alert alert) {
-    alert.getMonitoredService().unhealthy();
+    if (alerts.alertReceived(alert.getMonitoredService())) return;
 
     EscalationPolicy escalationPolicy = escalationPolicyService.findEscalationPolicy(alert.getMonitoredService());
 
+    alert.getMonitoredService().unhealthy();
     alert.setLevel(escalationPolicy.getLevels().first());
     alerts.save(alert);
 
@@ -32,11 +33,9 @@ public class PagerService {
   }
 
   public void receiveAcknowledgementTimeout(Alert alert) {
-    if (alert.isAcknowledged()) return;
-
-    if (alert.isLevelAcknowledged()) return;
-
-    if (alert.getMonitoredService().isHealthy()) return;
+    if (alert.isAcknowledged()
+        || alert.isLevelAcknowledged()
+        || alert.getMonitoredService().isHealthy()) return;
 
     EscalationPolicy escalationPolicy = escalationPolicyService.findEscalationPolicy(alert.getMonitoredService());
 
