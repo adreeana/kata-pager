@@ -1,9 +1,12 @@
-package com.adreeana.pager.domain;
+package com.adreeana.pager.alert;
+
+import com.adreeana.living_documentation.ValueObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@ValueObject
 public class Levels {
   private List<Level> levels;
 

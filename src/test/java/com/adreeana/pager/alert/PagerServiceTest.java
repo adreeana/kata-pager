@@ -1,4 +1,4 @@
-package com.adreeana.pager.domain;
+package com.adreeana.pager.alert;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -8,8 +8,8 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.Optional;
 
-import static com.adreeana.pager.domain.LevelsFixture.twoLevels;
-import static com.adreeana.pager.domain.MonitoredServiceFixture.monitoredService;
+import static com.adreeana.pager.alert.LevelsFixture.twoLevels;
+import static com.adreeana.pager.alert.MonitoredServiceFixture.monitoredService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

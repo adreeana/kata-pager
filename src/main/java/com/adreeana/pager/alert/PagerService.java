@@ -1,7 +1,10 @@
-package com.adreeana.pager.domain;
+package com.adreeana.pager.alert;
+
+import com.adreeana.living_documentation.DomainService;
 
 import java.util.Optional;
 
+@DomainService
 public class PagerService {
   private final Alerts alerts;
   private final AlertService alertService;
@@ -39,9 +42,7 @@ public class PagerService {
 
     EscalationPolicy escalationPolicy = escalationPolicyService.findEscalationPolicy(alert.getMonitoredService());
 
-    Level lastNotifiedLevel = alert.getLevel();
-
-    Optional<Level> nextLevel = escalationPolicy.getLevels().next(lastNotifiedLevel);
+    Optional<Level> nextLevel = escalationPolicy.getLevels().next(alert.getLevel());
     if (nextLevel.isPresent()) {
       alert.setLevel(nextLevel.get());
       alerts.save(alert);

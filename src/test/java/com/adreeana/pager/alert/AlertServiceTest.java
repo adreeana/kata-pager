@@ -1,20 +1,17 @@
-package com.adreeana.pager.domain;
+package com.adreeana.pager.alert;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.configuration.IMockitoConfiguration;
 
-import static com.adreeana.pager.domain.LevelsFixture.emailFirstTarget;
-import static com.adreeana.pager.domain.LevelsFixture.oneLevels;
-import static com.adreeana.pager.domain.LevelsFixture.smsFirstTarget;
-import static com.adreeana.pager.domain.MonitoredServiceFixture.monitoredService;
+import static com.adreeana.pager.alert.LevelsFixture.emailFirstTarget;
+import static com.adreeana.pager.alert.LevelsFixture.oneLevels;
+import static com.adreeana.pager.alert.LevelsFixture.smsFirstTarget;
+import static com.adreeana.pager.alert.MonitoredServiceFixture.monitoredService;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 class AlertServiceTest {

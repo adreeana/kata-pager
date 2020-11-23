@@ -1,5 +1,8 @@
-package com.adreeana.pager.domain;
+package com.adreeana.pager.alert;
 
+import com.adreeana.living_documentation.ValueObject;
+
+@ValueObject
 public class MonitoredService {
   private String id;
   private Boolean healthy;

@@ -1,4 +1,4 @@
-package com.adreeana.pager.domain;
+package com.adreeana.pager.alert;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

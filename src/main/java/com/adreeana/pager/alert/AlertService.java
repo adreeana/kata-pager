@@ -1,5 +1,8 @@
-package com.adreeana.pager.domain;
+package com.adreeana.pager.alert;
 
+import com.adreeana.living_documentation.DomainService;
+
+@DomainService
 public class AlertService {
   private final Alerts alerts;
   private final SmsService smsService;

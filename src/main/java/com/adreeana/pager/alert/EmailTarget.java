@@ -1,5 +1,8 @@
-package com.adreeana.pager.domain;
+package com.adreeana.pager.alert;
 
+import com.adreeana.living_documentation.ValueObject;
+
+@ValueObject
 public class EmailTarget implements Target {
   private final String email;
 

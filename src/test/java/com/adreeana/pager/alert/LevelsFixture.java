@@ -1,4 +1,4 @@
-package com.adreeana.pager.domain;
+package com.adreeana.pager.alert;
 
 public class LevelsFixture {
   final static public Target smsFirstTarget = new SmsTarget("0601");

@@ -1,5 +1,8 @@
-package com.adreeana.pager.domain;
+package com.adreeana.pager.alert;
 
+import com.adreeana.living_documentation.ValueObject;
+
+@ValueObject
 public class SmsTarget implements Target {
   private final String phoneNumber;
 

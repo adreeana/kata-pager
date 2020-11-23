@@ -1,5 +1,8 @@
-package com.adreeana.pager.domain;
+package com.adreeana.pager.alert;
 
+import com.adreeana.living_documentation.Entity;
+
+@Entity
 public class Alert {
   private String id;
   private MonitoredService monitoredService;
