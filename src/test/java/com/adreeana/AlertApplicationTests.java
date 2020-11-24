@@ -1,10 +1,10 @@
-package com.adreeana.pager;
+package com.adreeana;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PagerApplicationTests {
+class AlertApplicationTests {
 
   @Test
   void contextLoads() {

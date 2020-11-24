@@ -1,4 +1,4 @@
-package com.adreeana.pager.alert;
+package com.adreeana.alert;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -8,8 +8,8 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.Optional;
 
-import static com.adreeana.pager.alert.LevelsFixture.twoLevels;
-import static com.adreeana.pager.alert.MonitoredServiceFixture.monitoredService;
+import static com.adreeana.alert.fixtures.LevelsFixture.twoLevels;
+import static com.adreeana.alert.fixtures.MonitoredServiceFixture.monitoredService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -21,19 +21,19 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
-class PagerServiceTest {
-  private PagerService pagerService;
+class AlertServiceTest {
+  private AlertService alertService;
 
   private EscalationPolicyService escalationPolicyService = mock(EscalationPolicyService.class);
 
   private Alerts alerts = mock(Alerts.class);
-  private AlertService alertService = mock(AlertService.class);
+  private NotificationsService notificationsService = mock(NotificationsService.class);
 
   private TimerService timerService = mock(TimerService.class);
 
   @BeforeEach
   void setUp() {
-    pagerService = new PagerService(alerts, alertService, escalationPolicyService, timerService);
+    alertService = new AlertService(alerts, notificationsService, escalationPolicyService, timerService);
   }
 
   @Nested
@@ -55,7 +55,7 @@ class PagerServiceTest {
         void receiveAlert() {
           when(escalationPolicyService.findEscalationPolicy(alert.getMonitoredService())).thenReturn(escalationPolicy);
 
-          pagerService.receiveAlert(alert);
+          alertService.receiveAlert(alert);
 
           assertFalse(alert.getMonitoredService().isHealthy());
 
@@ -67,7 +67,7 @@ class PagerServiceTest {
 
           assertEquals(alert.getLevel(), escalationPolicy.getLevels().first());
 
-          verify(alertService).notifyLevel(alert);
+          verify(notificationsService).notifyLevel(alert);
 
           ArgumentCaptor<Alert> startTimerCaptor = ArgumentCaptor.forClass(Alert.class);
           verify(timerService).startTimer(startTimerCaptor.capture());
@@ -87,15 +87,15 @@ class PagerServiceTest {
 
         @Test
         void receiveAlert() {
-          when(alerts.alertReceived(alert.getMonitoredService())).thenReturn(true);
+          when(alerts.isAlertReceived(alert.getMonitoredService())).thenReturn(true);
 
-          pagerService.receiveAlert(anotherAlert);
+          alertService.receiveAlert(anotherAlert);
 
-          verify(alerts).alertReceived(alert.getMonitoredService());
+          verify(alerts).isAlertReceived(alert.getMonitoredService());
           verifyNoMoreInteractions(alerts);
 
           verifyNoInteractions(escalationPolicyService);
-          verifyNoInteractions(alertService);
+          verifyNoInteractions(notificationsService);
           verifyNoInteractions(timerService);
         }
       }
@@ -132,9 +132,9 @@ class PagerServiceTest {
 
             Level lastNotifiedLevel = alert.getLevel();
             assertNotNull(lastNotifiedLevel);
-            assertFalse(lastNotifiedLevel.isAcknowledged());
+            assertFalse(alert.isLevelAcknowledged());
 
-            pagerService.receiveAcknowledgementTimeout(alert);
+            alertService.receiveAcknowledgementTimeout(alert);
 
             ArgumentCaptor<Alert> alertCaptor = ArgumentCaptor.forClass(Alert.class);
             verify(alerts).save(alertCaptor.capture());
@@ -145,7 +145,7 @@ class PagerServiceTest {
             Optional<Level> nextLevel = escalationPolicy.getLevels().next(lastNotifiedLevel);
             assertTrue(nextLevel.isPresent());
             assertEquals(nextLevel.get(), alert.getLevel());
-            verify(alertService).notifyLevel(alert);
+            verify(notificationsService).notifyLevel(alert);
 
             ArgumentCaptor<Alert> startTimerCaptor = ArgumentCaptor.forClass(Alert.class);
             verify(timerService).startTimer(startTimerCaptor.capture());
@@ -169,36 +169,36 @@ class PagerServiceTest {
             Level lastNotifiedLevel = alert.getLevel();
             assertNotNull(lastNotifiedLevel);
 
-            pagerService.receiveAcknowledgementTimeout(alert);
+            alertService.receiveAcknowledgementTimeout(alert);
 
             assertEquals(lastNotifiedLevel, alert.getLevel());
 
             verifyNoInteractions(escalationPolicyService);
             verifyNoInteractions(alerts);
-            verifyNoInteractions(alertService);
+            verifyNoInteractions(notificationsService);
             verifyNoInteractions(timerService);
           }
         }
+      }
 
-        @Nested
-        class AlertIsAcknowledged {
-          @BeforeEach
-          void setUp() {
-            alert.acknowledge();
-          }
+      @Nested
+      class AlertIsAcknowledged {
+        @BeforeEach
+        void setUp() {
+          alert.acknowledge();
+        }
 
-          @Test
-          void receiveAcknowledgementTimeout() {
-            assertFalse(alert.getMonitoredService().isHealthy());
-            assertTrue(alert.isAcknowledged());
+        @Test
+        void receiveAcknowledgementTimeout() {
+          assertFalse(alert.getMonitoredService().isHealthy());
+          assertTrue(alert.isAcknowledged());
 
-            pagerService.receiveAcknowledgementTimeout(alert);
+          alertService.receiveAcknowledgementTimeout(alert);
 
-            verifyNoInteractions(escalationPolicyService);
-            verifyNoInteractions(alerts);
-            verifyNoInteractions(alertService);
-            verifyNoInteractions(timerService);
-          }
+          verifyNoInteractions(escalationPolicyService);
+          verifyNoInteractions(alerts);
+          verifyNoInteractions(notificationsService);
+          verifyNoInteractions(timerService);
         }
       }
     }
@@ -230,7 +230,7 @@ class PagerServiceTest {
         Level lastNotifiedLevel = alert.getLevel();
         assertNotNull(lastNotifiedLevel);
 
-        pagerService.receiveLevelAcknowledgement(alert);
+        alertService.receiveLevelAcknowledgement(alert);
 
         ArgumentCaptor<Alert> alertCaptor = ArgumentCaptor.forClass(Alert.class);
         verify(alerts).save(alertCaptor.capture());
@@ -239,7 +239,7 @@ class PagerServiceTest {
         assertEquals(alert, savedAlert);
 
         assertEquals(lastNotifiedLevel, alert.getLevel());
-        assertTrue(alert.getLevel().isAcknowledged());
+        assertTrue(alert.isLevelAcknowledged());
       }
     }
   }

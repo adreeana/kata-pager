@@ -1,4 +1,4 @@
-package com.adreeana.pager.alert;
+package com.adreeana.alert;
 
 import com.adreeana.living_documentation.Entity;
 
@@ -9,11 +9,13 @@ public class Alert {
   private String message;
   private Boolean acknowledged;
   private Level level;
+  private Boolean levelAcknowledged;
 
   public Alert(MonitoredService monitoredService, String message) {
     this.monitoredService = monitoredService;
     this.message = message;
     this.acknowledged = false;
+    this.levelAcknowledged = false;
   }
 
   public MonitoredService getMonitoredService() {
@@ -38,17 +40,16 @@ public class Alert {
 
   public void setLevel(Level level) {
     this.level = level;
+    this.levelAcknowledged = false;
   }
 
   public void acknowledgeLevel() {
     if (level == null) return;
 
-    level.acknowledge();
+    levelAcknowledged = true;
   }
 
   public Boolean isLevelAcknowledged() {
-    if (level == null) return false;
-
-    return level.isAcknowledged();
+    return levelAcknowledged;
   }
 }

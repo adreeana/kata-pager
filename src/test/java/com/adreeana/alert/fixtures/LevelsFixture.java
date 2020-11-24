@@ -1,4 +1,10 @@
-package com.adreeana.pager.alert;
+package com.adreeana.alert.fixtures;
+
+import com.adreeana.alert.EmailTarget;
+import com.adreeana.alert.Level;
+import com.adreeana.alert.Levels;
+import com.adreeana.alert.SmsTarget;
+import com.adreeana.alert.Target;
 
 public class LevelsFixture {
   final static public Target smsFirstTarget = new SmsTarget("0601");

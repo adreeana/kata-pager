@@ -1,5 +1,8 @@
-package com.adreeana.pager.alert;
+package com.adreeana.alert;
 
+import com.adreeana.alert.Alert;
+import com.adreeana.alert.Level;
+import com.adreeana.alert.MonitoredService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,13 +25,13 @@ class AlertTest {
     @Test
     void withAlertLevel() {
       Level level = new Level();
-      assertFalse(level.isAcknowledged());
+      assertFalse(alert.isLevelAcknowledged());
 
       alert.setLevel(level);
 
       alert.acknowledgeLevel();
 
-      assertTrue(level.isAcknowledged());
+      assertTrue(alert.isLevelAcknowledged());
     }
 
     @Test
@@ -43,11 +46,8 @@ class AlertTest {
     @Test
     void withAlertLevel() {
       Level level = new Level();
-      level.acknowledge();
-
-      assertTrue(level.isAcknowledged());
-
       alert.setLevel(level);
+      alert.acknowledgeLevel();
 
       assertTrue(alert.isLevelAcknowledged());
     }

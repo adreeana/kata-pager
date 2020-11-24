@@ -1,5 +1,7 @@
-package com.adreeana.pager.alert;
+package com.adreeana.alert;
 
+import com.adreeana.alert.Level;
+import com.adreeana.alert.Levels;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

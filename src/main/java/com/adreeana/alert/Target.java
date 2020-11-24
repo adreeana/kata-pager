@@ -1,4 +1,4 @@
-package com.adreeana.pager.alert;
+package com.adreeana.alert;
 
 public interface Target {
   String contact();

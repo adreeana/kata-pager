@@ -1,4 +1,4 @@
-package com.adreeana.pager.alert;
+package com.adreeana.alert;
 
 import com.adreeana.living_documentation.ValueObject;
 
@@ -8,12 +8,10 @@ import java.util.List;
 
 @ValueObject
 public class Level {
-  private List<Target> targets;
-  private Boolean acknowledged;
+  private final List<Target> targets;
 
   public Level() {
-    this.targets = new ArrayList<Target>();
-    this.acknowledged = false;
+    this.targets = new ArrayList<>();
   }
 
   public void addTarget(Target target) {
@@ -22,13 +20,5 @@ public class Level {
 
   public List<Target> getTargets() {
     return Collections.unmodifiableList(targets);
-  }
-
-  public Boolean isAcknowledged() {
-    return acknowledged;
-  }
-
-  void acknowledge() {
-    acknowledged = true;
   }
 }
