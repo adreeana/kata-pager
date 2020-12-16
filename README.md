@@ -1,10 +1,11 @@
 # Pager Kata
 
 Why:
+
 https://github.com/aircall/technical-test-pager
 
 Notes
-- Service tests are covering only the acceptance criterias described in the use case.
+- Service tests are covering only the acceptance criterias described in the use cases.
 - All the adapters have been implemented as infrastructure services. 
 An annotation @ExternalActor is used to describe the direction of the communication and their type.
 - In the pager bounded context the aggregate is Alert.
