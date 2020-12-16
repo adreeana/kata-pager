@@ -1,8 +1,7 @@
-# pager
+# Pager Kata
 
-Run tests:
-- IntelliJ: Import the project, then select Run All tests
-- Command line: mvn test
+Why:
+https://github.com/aircall/technical-test-pager
 
 Notes
 - Service tests are covering only the acceptance criterias described in the use case.
@@ -14,3 +13,7 @@ The repository and infrastructure services will be implemented in the Infrastruc
 This is the place where the conversion to and from the domain entity and value objects from and to the types for all the SPIs will stand.
 - There are no Spring annotations on the domain types. 
 The annotated types will lay in the Application and Infrastructure Layer and injected at run time by Spring.
+
+Run tests:
+- IntelliJ: Import the project, then select Run All tests
+- Command line: mvn test
